@@ -21,4 +21,4 @@
     name: syncthing@{{ syncthing_user }}
     state: "{{ syncthing_enable_service | ternary('started', 'stopped') }}"
     enabled: "{{ syncthing_enable_service }}"
-  when: syncthing_user
+  when: syncthing_user | length > 0

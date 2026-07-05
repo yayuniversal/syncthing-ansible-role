@@ -1,20 +1,20 @@
 ---
-- name: Download Syncthing repository GPG key
-  get_url:
-    url: https://syncthing.net/release-key.gpg
-    dest: /etc/apt/keyrings/syncthing-archive-keyring.gpg
-
 - name: Add Syncthing APT repository
-  apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable-v2"
-    filename: syncthing
-    state: present
-    update_cache: true
+  deb822_repository:
+    name: syncthing
+    types: deb
+    uris: https://apt.syncthing.net/
+    suites: syncthing
+    components: stable-v2
+    signed_by: https://syncthing.net/release-key.gpg
+    install_python_debian: yes
+  register: _syncthing_repo
 
 - name: Install Syncthing
   apt:
     name: syncthing
     state: present
+    update_cache: "{{ _syncthing_repo.changed }}"
 
 - name: "{{ syncthing_enable_service | ternary('Enable', 'Disable') }} syncthing systemd service for user {{ syncthing_user }}"
   service:
